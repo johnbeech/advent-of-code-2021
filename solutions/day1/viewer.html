@@ -5,6 +5,32 @@
     <style>
       html, body { font-family: sans-serif; }
       pre { border-radius: 0.5em; padding: 0.5em; background: #eee; }
+      .scans {
+        max-width: 630px;
+      }
+      .scans > .depth {
+        display: flex;
+        flex-direction: row;
+      }
+      .depth > * {
+        flex: 1 1;
+        white-space: nowrap;
+      }
+      .depth > b:first-of-type {
+        flex: 0;
+        min-width: 40px;
+        margin-right: 1em;
+        font-weight: normal;
+      }
+      .depth.increased {
+        color: black;
+      }
+      .depth.decreased {
+        color: #999;
+      }
+      .depth.no.previous.sum {
+        color: #A00
+      }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
@@ -13,8 +39,27 @@
     <div id="viewer">
       <h1>Solution Viewer ({{ solutionTitle }})</h1>
       <p>For interesting problems; this page can be used as a dynamic viewer.</p>
+      <h2>Solution 1 : {{ solution1.solution }}</h2>
+      <div class="scans">
+        <div v-for="(depth, idx) in solution1.depths" :key="`sc1-${idx}`"
+          :class="`depth ${describe(depth)}`" >
+          <b>{{ idx }}</b>
+          <b>Scan: {{ depth.scan }}</b>
+          <b>Diff: {{ depth.diff }}</b>
+          <b>({{ describe(depth) }})</b>
+        </div>
+      </div>
+      <h2>Solution 2 : {{ solution2.solution }}</h2>
+      <div class="scans">
+        <div v-for="(depth, idx) in solution2.depths" :key="`sc2-${idx}`"
+        :class="`depth ${describe(depth)}`" >
+          <b>{{ idx }}</b>
+          <b>Scan: {{ depth.scan }}</b>
+          <b>Diff: {{ depth.diff }}</b>
+          <b>({{ describe(depth) }})</b>
+        </div>
+      </div>
       <h3><a href="./input.txt">input.txt</a></h3>
-      <pre><code>{{ inputText }}</code></pre>
       <h3><a href="./solution.js">solution.js</a></h3>
       <pre><code>{{ solutionText }}</code></pre>
     </div>
@@ -24,7 +69,9 @@ const app = new Vue({
   data: () => {
     return {
       solutionText: '[Loading]',
-      inputText: '[Loading]'
+      inputText: '[Loading]',
+      solution1: {},
+      solution2: {}
     }
   },
   computed: {
@@ -33,11 +80,71 @@ const app = new Vue({
       return parts.reverse()[1]
     }
   },
+  methods: {
+    describe(depth) {
+      if (depth.diff === 0) {
+        return 'no change'
+      }
+      if (!depth.diff) {
+        return 'N/A - no previous sum'
+      }
+      return depth.diff > 0 ? 'increased' : 'decreased' 
+    }
+  },
   async mounted () {
     this.solutionText = (await axios.get('./solution.js')).data
     this.inputText = (await axios.get('./input.txt')).data
+    this.solution1 = await solveForFirstStar(this.inputText)
+    this.solution2 = await solveForSecondStar(this.inputText)
   }
 })
+
+function parseDepths (input) {
+  const depths = input.split('\n').map(n => Number.parseInt(n)).map(n => {
+    return {
+      scan: n
+    }
+  })
+
+  depths.forEach((depth, index) => {
+    const previousDepth = depths[index - 1] || { scan: NaN }
+    depth.diff = depth.scan - previousDepth.scan
+  })
+
+  return depths
+}
+
+async function solveForFirstStar (input) {
+  const depths = parseDepths(input)
+  const solution = depths.filter(d => d.diff > 0).length
+
+  return {
+    solution,
+    depths
+  }
+}
+
+async function solveForSecondStar (input) {
+  const depths = parseDepths(input)
+
+  depths.forEach((depth, index) => {
+    const p1 = depth
+    const p2 = depths[index - 1] || { scan: NaN }
+    const p3 = depths[index - 2] || { scan: NaN }
+    depth.window = p1.scan + p2.scan + p3.scan
+  })
+
+  depths.forEach((depth, index) => {
+    const previousDepth = depths[index - 1] || { scan: 0 }
+    depth.diff = depth.window - previousDepth.window
+  })
+
+  const solution = depths.filter(d => d.diff > 0).length
+  return {
+    solution,
+    depths
+  }
+}
     </script>
   </body>
 </html>

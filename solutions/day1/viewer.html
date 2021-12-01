@@ -40,8 +40,9 @@
       <h1>Solution Viewer ({{ solutionTitle }})</h1>
       <p>For interesting problems; this page can be used as a dynamic viewer.</p>
       <h2>Solution 1 : {{ solution1.solution }}</h2>
+      <p>Showing first 50:</p>
       <div class="scans">
-        <div v-for="(depth, idx) in solution1.depths" :key="`sc1-${idx}`"
+        <div v-for="(depth, idx) in scanWindow(solution1.depths)" :key="`sc1-${idx}`"
           :class="`depth ${describe(depth)}`" >
           <b>{{ idx }}</b>
           <b>Scan: {{ depth.scan }}</b>
@@ -50,8 +51,9 @@
         </div>
       </div>
       <h2>Solution 2 : {{ solution2.solution }}</h2>
+      <p>Showing first 50:</p>
       <div class="scans">
-        <div v-for="(depth, idx) in solution2.depths" :key="`sc2-${idx}`"
+        <div v-for="(depth, idx) in scanWindow(solution2.depths)" :key="`sc2-${idx}`"
         :class="`depth ${describe(depth)}`" >
           <b>{{ idx }}</b>
           <b>Scan: {{ depth.scan }}</b>
@@ -89,6 +91,9 @@ const app = new Vue({
         return 'N/A - no previous sum'
       }
       return depth.diff > 0 ? 'increased' : 'decreased' 
+    },
+    scanWindow(depths) {
+      return depths.slice(0, 50)
     }
   },
   async mounted () {

@@ -18,7 +18,7 @@ function parseDepths (input) {
   })
 
   depths.forEach((depth, index) => {
-    const previousDepth = depths[index - 1] || { scan: 0 }
+    const previousDepth = depths[index - 1] || { scan: NaN }
     depth.diff = depth.scan - previousDepth.scan
   })
 
@@ -27,9 +27,9 @@ function parseDepths (input) {
 
 async function solveForFirstStar (input) {
   const depths = parseDepths(input)
-  const solution = depths.filter(d => d.diff > 0).length - 1
+  const solution = depths.filter(d => d.diff > 0).length
 
-  report('Input:', input)
+  report('Input:', depths.length, 'depth scans')
   report('Solution 1:', solution)
 }
 
@@ -38,8 +38,8 @@ async function solveForSecondStar (input) {
 
   depths.forEach((depth, index) => {
     const p1 = depth
-    const p2 = depths[index - 1] || { scan: 0 }
-    const p3 = depths[index - 2] || { scan: 0 }
+    const p2 = depths[index - 1] || { scan: NaN }
+    const p3 = depths[index - 2] || { scan: NaN }
     depth.window = p1.scan + p2.scan + p3.scan
   })
 
@@ -50,7 +50,7 @@ async function solveForSecondStar (input) {
 
   await write(fromHere('depths.json'), JSON.stringify(depths, null, 2), 'utf8')
 
-  const solution = depths.filter(d => d.diff > 0).length - 2
+  const solution = depths.filter(d => d.diff > 0).length
   report('Solution 2:', solution)
 }
 

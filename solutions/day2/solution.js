@@ -15,14 +15,21 @@ function parseInstructions (input) {
   return instructions
 }
 
-const commands = {
+const part1Commands = {
   forward,
   down,
   up
 }
 
+const part2Commands = {
+  forward,
+  down: aimDown,
+  up: aimUp
+}
+
 function forward ({ distance }, position) {
   position.x = position.x + distance
+  position.y = position.y + position.aim * distance
 }
 
 function down ({ distance }, position) {
@@ -31,6 +38,14 @@ function down ({ distance }, position) {
 
 function up ({ distance }, position) {
   position.y = position.y - distance
+}
+
+function aimDown ({ distance }, position) {
+  position.aim = position.aim + distance
+}
+
+function aimUp ({ distance }, position) {
+  position.aim = position.aim - distance
 }
 
 async function run () {
@@ -42,16 +57,14 @@ async function run () {
 
 async function solveForFirstStar (input) {
   const instructions = parseInstructions(input)
-
-  report('Input:', instructions)
-
   const position = {
     x: 0,
-    y: 0
+    y: 0,
+    aim: 0
   }
   while (instructions.length > 0) {
     const next = instructions.shift()
-    const command = commands[next.direction]
+    const command = part1Commands[next.direction]
     command(next, position)
   }
 
@@ -60,7 +73,19 @@ async function solveForFirstStar (input) {
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const instructions = parseInstructions(input)
+  const position = {
+    x: 0,
+    y: 0,
+    aim: 0
+  }
+  while (instructions.length > 0) {
+    const next = instructions.shift()
+    const command = part2Commands[next.direction]
+    command(next, position)
+  }
+
+  const solution = position.x * position.y
   report('Solution 2:', solution)
 }
 

@@ -24,12 +24,18 @@
       }
       .depth.increased {
         color: black;
+        fill: #9AF;
       }
       .depth.decreased {
         color: #999;
+        fill: #89F;
+      }
+      .depth.no.change {
+        fill: #ABF;
       }
       .depth.no.previous.sum {
-        color: #A00
+        color: #A00;
+        fill: red;
       }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -40,26 +46,44 @@
       <h1>Solution Viewer ({{ solutionTitle }})</h1>
       <p>For interesting problems; this page can be used as a dynamic viewer.</p>
       <h2>Solution 1 : {{ solution1.solution }}</h2>
-      <p>Showing first 50:</p>
-      <div class="scans">
-        <div v-for="(depth, idx) in scanWindow(solution1.depths)" :key="`sc1-${idx}`"
-          :class="`depth ${describe(depth)}`" >
-          <b>{{ idx }}</b>
-          <b>Scan: {{ depth.scan }}</b>
-          <b>Diff: {{ depth.diff }}</b>
-          <b>({{ describe(depth) }})</b>
-        </div>
+      <p>Showing first {{ display }}:</p>
+      <div class="scans" v-if="solution1">
+        <svg :width="displayWidth(solution1)" :height="(maxDepth(solution1.depths) / 10) + skyHeight * 2">
+          <rect :width="displayWidth(solution1)" :height="(maxDepth(solution1.depths) / 10) + skyHeight * 2" fill="black" />
+          <rect :width="displayWidth(solution1)" :height="skyHeight" fill="skyblue" />
+          <g :transform="`translate(0, ${skyHeight})`">
+            <rect v-for="(depth, idx) in scanWindow(solution1.depths)" :key="`sc1-${idx}`"
+              width="10"
+              :height="depth.scan / 10"
+              :transform="`translate(${idx * 10} 0)`"
+              :class="`depth ${describe(depth)}`">
+          </g>
+          <g :transform="`translate(${boat.x}, ${skyHeight - 5})`">
+            <path fill="yellow" d="M-15 -3 L15 -3 L10 5 L-10 5" />
+            <rect fill="black" width="3" height="10" y="-13" />
+            <path fill="orange" d="M0 -4 L-10 -4 L0 -13" />
+          </g>
+        </svg>
       </div>
       <h2>Solution 2 : {{ solution2.solution }}</h2>
-      <p>Showing first 50:</p>
-      <div class="scans">
-        <div v-for="(depth, idx) in scanWindow(solution2.depths)" :key="`sc2-${idx}`"
-        :class="`depth ${describe(depth)}`" >
-          <b>{{ idx }}</b>
-          <b>Scan: {{ depth.scan }}</b>
-          <b>Diff: {{ depth.diff }}</b>
-          <b>({{ describe(depth) }})</b>
-        </div>
+      <p>Showing first {{ display }}:</p>
+      <div class="scans" v-if="solution2"></div>
+        <svg :width="displayWidth(solution2)" :height="(maxDepth(solution2.depths) / 10) + skyHeight * 2">
+          <rect :width="displayWidth(solution2)" :height="(maxDepth(solution2.depths) / 10) + skyHeight * 2" fill="black" />
+          <rect :width="displayWidth(solution2)" :height="skyHeight" fill="skyblue" />
+          <g :transform="`translate(0, ${skyHeight})`">
+            <rect v-for="(depth, idx) in scanWindow(solution2.depths)" :key="`sc1-${idx}`"
+              width="10"
+              :height="depth.scan / 10"
+              :transform="`translate(${idx * 10} 0)`"
+              :class="`depth ${describe(depth)}`">
+          </g>
+          <g :transform="`translate(${boat.x}, ${skyHeight - 5})`">
+            <path fill="yellow" d="M-15 -3 L15 -3 L10 5 L-10 5" />
+            <rect fill="black" width="3" height="10" y="-13" />
+            <path fill="orange" d="M0 -4 L-10 -4 L0 -13" />
+          </g>
+        </svg>
       </div>
       <h3><a href="./input.txt">input.txt</a></h3>
       <h3><a href="./solution.js">solution.js</a></h3>
@@ -70,16 +94,26 @@ const app = new Vue({
   el: '#viewer',
   data: () => {
     return {
+      timer: 0,
+      skyHeight: 100,
+      display: 100,
       solutionText: '[Loading]',
       inputText: '[Loading]',
-      solution1: {},
-      solution2: {}
+      solution1: false,
+      solution2: false
     }
   },
   computed: {
     solutionTitle() {
       const parts = (document.location + '').split('/')
       return parts.reverse()[1]
+    },
+    boat() {
+      const scans = this.solution1.depths || []
+      const offset = this.timer % scans.length
+      return {
+        x: (140 + offset) || 40
+      }
     }
   },
   methods: {
@@ -93,7 +127,18 @@ const app = new Vue({
       return depth.diff > 0 ? 'increased' : 'decreased' 
     },
     scanWindow(depths) {
-      return depths.slice(0, 50)
+      const { display, boat } = this
+      const list = depths || []
+      const start = Math.floor(boat.x)
+      const end = start + display
+      return list.slice(start, end)
+    },
+    maxDepth(depths) {
+      const list = depths || []
+      return Math.max(...list.map(d => d.scan), 10)
+    },
+    displayWidth(solution) {
+      return this.display * 10
     }
   },
   async mounted () {
@@ -101,6 +146,11 @@ const app = new Vue({
     this.inputText = (await axios.get('./input.txt')).data
     this.solution1 = await solveForFirstStar(this.inputText)
     this.solution2 = await solveForSecondStar(this.inputText)
+
+    const self = this
+    setInterval(() => {
+      self.timer = self.timer + 2
+    }, 25)
   }
 })
 

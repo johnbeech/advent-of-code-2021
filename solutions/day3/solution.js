@@ -3,10 +3,7 @@ const { read, position } = require('promise-path')
 const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
 
-function parseReport (input) {
-  const lines = input.split('\n')
-
-  const sequences = lines.map(line => line.split('').map(n => Number.parseInt(n)))
+function mostCommonLeastCommon (sequences) {
   const columns = sequences[0].map((n, i) => {
     return {
       index: i,
@@ -17,26 +14,56 @@ function parseReport (input) {
     }
   })
 
-  columns.forEach(column => {
-    sequences.forEach(row => {
-      const value = row[column.index]
-      const counter = value ? 'ones' : 'zeroes'
-      column[counter]++
-    })
-    const { zeroes, ones } = column
-    column.mostCommonBit = zeroes > ones ? 0 : 1
-    column.leastCommonBit = zeroes > ones ? 1 : 0
+  columns.forEach(column => updateColumn(column, sequences))
+
+  return columns
+}
+
+function updateColumn (column, sequences) {
+  column.ones = 0
+  column.zeroes = 0
+  sequences.forEach(row => {
+    const value = row[column.index]
+    const counter = value ? 'ones' : 'zeroes'
+    column[counter]++
   })
+  const { zeroes, ones } = column
+  column.mostCommonBit = zeroes > ones ? 0 : 1
+  column.leastCommonBit = zeroes > ones ? 1 : 0
+}
+
+function parseReport (input) {
+  const lines = input.split('\n')
+
+  const sequences = lines.map(line => line.split('').map(n => Number.parseInt(n)))
+  const columns = mostCommonLeastCommon(sequences)
 
   const gammaRate = Number.parseInt(columns.map(c => c.mostCommonBit).join(''), 2)
   const epsilonRate = Number.parseInt(columns.map(c => c.leastCommonBit).join(''), 2)
+
+  let oxygenSequences = sequences
+  const oxygenColumn = columns.map(column => {
+    updateColumn(column, oxygenSequences)
+    oxygenSequences = oxygenSequences.filter(row => row[column.index] === column.mostCommonBit)
+    return column
+  })
+  const oxygenGeneratorRating = Number.parseInt(oxygenColumn.map(c => c.mostCommonBit).join(''), 2)
+
+  let co2Sequences = sequences
+  const co2Column = columns.map(column => {
+    updateColumn(column, co2Sequences)
+    co2Sequences = co2Sequences.filter(row => row[column.index] === column.leastCommonBit)
+    return column
+  })
+  const co2ScrubberRating = Number.parseInt(co2Column.map(c => c.leastCommonBit).join(''), 2)
 
   const report = {
     sequences,
     columns,
     gammaRate,
     epsilonRate,
-    solution: gammaRate * epsilonRate
+    oxygenGeneratorRating,
+    co2ScrubberRating
   }
 
   return report
@@ -51,13 +78,17 @@ async function run () {
 
 async function solveForFirstStar (input) {
   const engineReport = parseReport(input)
-  const solution = engineReport.solution
+  const { gammaRate, epsilonRate } = engineReport
+  const solution = gammaRate * epsilonRate
   report('Report:', engineReport)
   report('Solution 1:', solution)
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const engineReport = parseReport(input)
+
+  const { oxygenGeneratorRating, co2ScrubberRating } = engineReport
+  const solution = oxygenGeneratorRating * co2ScrubberRating
   report('Solution 2:', solution)
 }
 

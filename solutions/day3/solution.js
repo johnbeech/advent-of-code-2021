@@ -89,7 +89,7 @@ function parseReport (input) {
 }
 
 async function run () {
-  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)

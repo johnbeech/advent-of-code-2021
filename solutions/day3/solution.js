@@ -14,12 +14,12 @@ function mostCommonLeastCommon (sequences) {
     }
   })
 
-  columns.forEach(column => updateColumn(column, sequences))
+  columns.forEach(column => updateColumn(column, sequences, true))
 
   return columns
 }
 
-function updateColumn (column, sequences) {
+function updateColumn (column, sequences, roundDown) {
   column.ones = 0
   column.zeroes = 0
   sequences.forEach(row => {
@@ -28,8 +28,13 @@ function updateColumn (column, sequences) {
     column[counter]++
   })
   const { zeroes, ones } = column
-  column.mostCommonBit = zeroes > ones ? 0 : 1
-  column.leastCommonBit = zeroes > ones ? 1 : 0
+  if (roundDown) {
+    column.mostCommonBit = ones > zeroes ? 1 : 0
+    column.leastCommonBit = ones > zeroes ? 0 : 1
+  } else {
+    column.mostCommonBit = ones >= zeroes ? 1 : 0
+    column.leastCommonBit = ones >= zeroes ? 0 : 1
+  }
 }
 
 function parseReport (input) {
@@ -44,7 +49,14 @@ function parseReport (input) {
   let oxygenSequences = sequences
   const oxygenColumn = columns.map(column => {
     updateColumn(column, oxygenSequences)
-    oxygenSequences = oxygenSequences.filter(row => row[column.index] === column.mostCommonBit)
+    if (oxygenSequences.length > 1) {
+      oxygenSequences = oxygenSequences.filter(row => row[column.index] === column.mostCommonBit)
+    }
+    if (oxygenSequences.length === 1) {
+      column.mostCommonBit = oxygenSequences[0][column.index]
+      column.leastCommonBit = oxygenSequences[0][column.index]
+    }
+    // console.log('Oxygen Sequences', oxygenSequences)
     return column
   })
   const oxygenGeneratorRating = Number.parseInt(oxygenColumn.map(c => c.mostCommonBit).join(''), 2)
@@ -52,7 +64,14 @@ function parseReport (input) {
   let co2Sequences = sequences
   const co2Column = columns.map(column => {
     updateColumn(column, co2Sequences)
-    co2Sequences = co2Sequences.filter(row => row[column.index] === column.leastCommonBit)
+    if (co2Sequences.length > 1) {
+      co2Sequences = co2Sequences.filter(row => row[column.index] === column.leastCommonBit)
+    }
+    if (co2Sequences.length === 1) {
+      column.mostCommonBit = co2Sequences[0][column.index]
+      column.leastCommonBit = co2Sequences[0][column.index]
+    }
+    // console.log('CO2 Sequences', co2Sequences)
     return column
   })
   const co2ScrubberRating = Number.parseInt(co2Column.map(c => c.leastCommonBit).join(''), 2)
@@ -70,7 +89,7 @@ function parseReport (input) {
 }
 
 async function run () {
-  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -80,7 +99,6 @@ async function solveForFirstStar (input) {
   const engineReport = parseReport(input)
   const { gammaRate, epsilonRate } = engineReport
   const solution = gammaRate * epsilonRate
-  report('Report:', engineReport)
   report('Solution 1:', solution)
 }
 
@@ -89,6 +107,7 @@ async function solveForSecondStar (input) {
 
   const { oxygenGeneratorRating, co2ScrubberRating } = engineReport
   const solution = oxygenGeneratorRating * co2ScrubberRating
+  report('Report:', engineReport)
   report('Solution 2:', solution)
 }
 

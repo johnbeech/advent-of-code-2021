@@ -1,8 +1,10 @@
 const generateSidebar = require('./generateSidebar')
+const { name, logName } = require('../package.json')
 
 async function generateVueConfig() {
   const vueConfig = {
-    base: '/advent-of-code-2021/',
+    base: `/${name}/`,
+    title: logName,
     themeConfig: {
       sidebar: await generateSidebar()
     }

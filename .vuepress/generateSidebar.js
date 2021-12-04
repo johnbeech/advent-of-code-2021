@@ -10,12 +10,14 @@ async function readTitle(filepath) {
 
 async function generateSidebar() {
   const fromRoot = position(__dirname, '../')
-  const solutions = await find(fromRoot('solutions/**/*.md'))
-  const sidebar = await Promise.all(solutions.map(async (filepath) => {
+  const markdownFiles = await find(fromRoot('**/*.md'))
+  const sidebarFiles = markdownFiles.filter(f => !f.includes('node_modules'))
+
+  const sidebar = await Promise.all(sidebarFiles.map(async (filepath) => {
     const title = await readTitle(filepath)
     const path = filepath
       .replace(fromRoot(''), '')
-      .replace('README.md', '')
+      .replace('README.md', '') || '/'
     return {
       title,
       path

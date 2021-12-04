@@ -4,7 +4,7 @@ const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
 
 async function run () {
-  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -110,7 +110,6 @@ function playBingo (bingoGame) {
 
 async function solveForFirstStar (input) {
   const bingoGame = parseBingoFrom(input)
-
   const gameResult = playBingo(bingoGame)
 
   await write(fromHere('bingo.json'), JSON.stringify(gameResult, null, 2), 'utf8')
@@ -122,7 +121,22 @@ async function solveForFirstStar (input) {
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const bingoGame = parseBingoFrom(input)
+
+  const gameResults = bingoGame.boards.map(board => {
+    const individualGame = JSON.parse(JSON.stringify(bingoGame))
+    individualGame.boards = [board]
+    return playBingo(individualGame)
+  })
+
+  const sortedResults = gameResults.sort((a, b) => a.drawnNumbers.length > b.drawnNumbers.length ? -1 : 1)
+  const lastWinner = sortedResults[0]
+
+  await write(fromHere('sortedResults.json'), JSON.stringify(sortedResults, null, 2), 'utf8')
+
+  const sumOfUnmarkedNumbers = lastWinner.winningBoardUnmarkedNumbers.reduce((acc, n) => acc + n, 0)
+  const solution = sumOfUnmarkedNumbers * lastWinner.lastDrawnNumber
+
   report('Solution 2:', solution)
 }
 

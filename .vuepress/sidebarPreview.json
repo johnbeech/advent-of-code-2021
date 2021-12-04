@@ -1,10 +1,22 @@
 [
   {
-    "title": "solutions/day1/",
+    "title": "Day 1: Sonar Sweep",
     "path": "solutions/day1/"
   },
   {
-    "title": "solutions/",
-    "path": "solutions/"
+    "title": "Day 2: Dive!",
+    "path": "solutions/day2/"
+  },
+  {
+    "title": "Day 3: Binary Diagnostic",
+    "path": "solutions/day3/"
+  },
+  {
+    "title": "Day 4: Giant Squid",
+    "path": "solutions/day4/"
+  },
+  {
+    "title": "Day N: Template",
+    "path": "solutions/template/"
   }
 ]

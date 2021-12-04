@@ -1,5 +1,9 @@
 [
   {
+    "title": "Advent of Code 2021",
+    "path": "/"
+  },
+  {
     "title": "Day 1: Sonar Sweep",
     "path": "solutions/day1/"
   },

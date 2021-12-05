@@ -1,0 +1,22 @@
+name: Build and Deploy
+on: 
+  push:
+    branches:
+      - main
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Run build steps
+      run: npm build -s
+
+    - name: Run default tests
+      run: npm test -s
+
+    - name: Deploy to gh-pages branch
+      run: npm run deploy
+
+

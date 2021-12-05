@@ -25,8 +25,18 @@ export default {
     }
   },
   async mounted () {
-    this.solutionText = (await axios.get('./solution.js')).data
-    this.inputText = (await axios.get('./input.txt')).data
+    this.solutionText = await this.load('./solution.js')
+    this.inputText = await this.load('./input.txt')
+  },
+  methods: {
+    async load(url) {
+      try {
+        const { data } = await axios.get(url)
+        return data
+      } catch (ex) {
+        return `${ex.message} for ${url}`
+      }
+    }
   }
 }
 </script>

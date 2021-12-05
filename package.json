@@ -22,5 +22,9 @@
     "standard": "*",
     "stats-lite": "*",
     "vuepress": "^1.8.2"
+  },
+  "devDependencies": {
+    "@vuepress/plugin-register-components": "^1.8.2",
+    "axios": "^0.24.0"
   }
 }

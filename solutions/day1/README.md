@@ -7,3 +7,5 @@ As the submarine drops below the surface of the ocean, it automatically performs
 ## Part 2
 
 Consider sums of a three-measurement sliding window; **how many sums are larger than the previous sum?**
+
+<day1-Viewer />

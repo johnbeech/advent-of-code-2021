@@ -9,8 +9,10 @@
     "webserver": "npm run docs:dev -s",
     "test": "npm run lint",
     "lint": "standard --fix",
+    "build": "vuepress build && ./build.sh",
     "docs:dev": "vuepress dev .",
-    "docs:build": "vuepress build ."
+    "docs:build": "vuepress build .",
+    "deploy": "gh-pages -d .vuepress/dist"
   },
   "author": "John Beech",
   "license": "ISC",
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@vuepress/plugin-register-components": "^1.8.2",
-    "axios": "^0.24.0"
+    "axios": "^0.24.0",
+    "gh-pages": "^3.2.3"
   }
 }

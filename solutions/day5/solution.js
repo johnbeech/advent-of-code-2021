@@ -4,7 +4,7 @@ const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
 
 async function run () {
-  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -40,11 +40,9 @@ function drawLine (start, end, grid) {
     const ratio = n / total
     points.push({
       x: Math.round(start.x + (xdiff * ratio)),
-      y: Math.round(start.y + (ydiff * ratio)),
-      ratio
+      y: Math.round(start.y + (ydiff * ratio))
     })
   }
-  console.log(start, end, 'xd', xdiff, 'yd', ydiff, 'len', total, 'points:', points)
 
   points.forEach(point => {
     const key = [point.x, point.y].join(':')
@@ -80,11 +78,12 @@ async function solveForFirstStar (input) {
   const thermalGrid = drawThermalGrid(thermalMap)
   await write(fromHere('thermalGrid.txt'), thermalGrid, 'utf8')
 
-  report('Input:', vectorsOfInterest, 'analysing', vectorsOfInterest.length, 'of', vectors.length, 'total')
+  report('Analysing', vectorsOfInterest.length, 'of', vectors.length, 'total')
 
   await write(fromHere('thermalMap.json'), JSON.stringify(thermalMap, null, 2), 'utf8')
 
-  const solution = thermalMap.overlaps.length
+  const setOfOverlaps = new Set(thermalMap.overlaps.map(n => [n.x, n.y].join(':')))
+  const solution = setOfOverlaps.size
   report('Solution 1:', solution)
 }
 

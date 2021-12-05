@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Hello AoC!</h2>
+    <h2>My Solution</h2>
     <h3>Solution Code</h3>
     <pre class="language-js"><code>{{ solutionText }}</code></pre>
     <h3>Input</h3>

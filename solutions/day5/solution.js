@@ -102,7 +102,29 @@ function drawThermalGrid (thermalMap) {
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const vectors = parseVentVectors(input)
+
+  const thermalMap = {
+    overlaps: [],
+    m: [],
+    width: 0,
+    height: 0,
+    '0:0': 0
+  }
+
+  vectors.forEach(vector => {
+    drawLine(vector.start, vector.end, thermalMap)
+  })
+
+  const thermalGrid = drawThermalGrid(thermalMap)
+  await write(fromHere('thermalGridWithDiagonals.txt'), thermalGrid, 'utf8')
+
+  report('Analysing all vectors:', vectors.length, 'total')
+
+  await write(fromHere('thermalMapWithDiagonals.json'), JSON.stringify(thermalMap, null, 2), 'utf8')
+
+  const setOfOverlaps = new Set(thermalMap.overlaps.map(n => [n.x, n.y].join(':')))
+  const solution = setOfOverlaps.size
   report('Solution 2:', solution)
 }
 

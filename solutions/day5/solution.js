@@ -4,7 +4,7 @@ const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
 
 async function run () {
-  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -30,19 +30,21 @@ function pos (coords) {
 }
 
 function drawLine (start, end, grid) {
-  const xdiff = Math.abs(start.x - end.x)
-  const ydiff = Math.abs(start.y - end.y)
-  const total = Math.max(xdiff, ydiff)
+  const xdiff = end.x - start.x
+  const ydiff = end.y - start.y
+  const total = Math.max(Math.abs(xdiff), Math.abs(ydiff))
 
   const points = []
-  while (points.length < total) {
+  while (points.length <= total) {
     const n = points.length
     const ratio = n / total
     points.push({
-      x: Math.round(start.x + xdiff * ratio),
-      y: Math.round(start.y + ydiff * ratio)
+      x: Math.round(start.x + (xdiff * ratio)),
+      y: Math.round(start.y + (ydiff * ratio)),
+      ratio
     })
   }
+  console.log(start, end, 'xd', xdiff, 'yd', ydiff, 'len', total, 'points:', points)
 
   points.forEach(point => {
     const key = [point.x, point.y].join(':')
@@ -51,6 +53,9 @@ function drawLine (start, end, grid) {
       grid.overlaps.push(point)
     }
   })
+
+  grid.width = Math.max(grid.width, end.x, start.x)
+  grid.height = Math.max(grid.height, end.y, start.y)
 }
 
 async function solveForFirstStar (input) {
@@ -61,13 +66,19 @@ async function solveForFirstStar (input) {
   })
 
   const thermalMap = {
-    '0:0': 0,
-    overlaps: []
+    overlaps: [],
+    m: [],
+    width: 0,
+    height: 0,
+    '0:0': 0
   }
 
   vectorsOfInterest.forEach(vector => {
     drawLine(vector.start, vector.end, thermalMap)
   })
+
+  const thermalGrid = drawThermalGrid(thermalMap)
+  await write(fromHere('thermalGrid.txt'), thermalGrid, 'utf8')
 
   report('Input:', vectorsOfInterest, 'analysing', vectorsOfInterest.length, 'of', vectors.length, 'total')
 
@@ -75,6 +86,20 @@ async function solveForFirstStar (input) {
 
   const solution = thermalMap.overlaps.length
   report('Solution 1:', solution)
+}
+
+function drawThermalGrid (thermalMap) {
+  const lines = []
+  for (let y = 0; y <= thermalMap.height; y++) {
+    const line = []
+    for (let x = 0; x <= thermalMap.width; x++) {
+      const key = [x, y].join(':')
+      const symbol = thermalMap[key] ? thermalMap[key] : '.'
+      line.push(symbol)
+    }
+    lines.push(line.join(''))
+  }
+  return lines.join('\n')
 }
 
 async function solveForSecondStar (input) {

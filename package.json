@@ -17,16 +17,16 @@
   "author": "John Beech",
   "license": "ISC",
   "dependencies": {
-    "@connected-web/md2json": "^1.1.0",
     "express": "^4.16.4",
     "pre-push": "*",
     "promise-path": "*",
     "standard": "*",
-    "stats-lite": "*",
-    "vuepress": "^1.8.2"
+    "stats-lite": "*"
   },
   "devDependencies": {
+    "vuepress": "^1.8.2",
     "@vuepress/plugin-register-components": "^1.8.2",
+    "@connected-web/md2json": "^1.1.0",
     "axios": "^0.24.0",
     "gh-pages": "^3.2.3"
   }

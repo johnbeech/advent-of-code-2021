@@ -20,6 +20,10 @@
     "path": "solutions/day4/"
   },
   {
+    "title": "Day 5: Hydrothermal Venture",
+    "path": "solutions/day5/"
+  },
+  {
     "title": "Day N: Template",
     "path": "solutions/template/"
   }

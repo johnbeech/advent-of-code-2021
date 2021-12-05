@@ -7,3 +7,5 @@ Use the binary numbers in your diagnostic report to calculate the gamma rate and
 ## Part 2
 
 Use the binary numbers in your diagnostic report to calculate the oxygen generator rating and CO2 scrubber rating, then multiply them together. **What is the life support rating of the submarine?**
+
+<day3-Viewer />

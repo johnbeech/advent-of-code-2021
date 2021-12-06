@@ -6,6 +6,6 @@ Find a way to simulate lanternfish. **How many lanternfish would there be after 
 
 ## Part 2
 
-Short description of problem.
+**How many lanternfish would there be after 256 days?**
 
 <day6-Viewer />

@@ -18,7 +18,8 @@ function parseInput (input) {
 
   const fish = values.map((value) => {
     return {
-      t: value
+      t: value,
+      c: 1
     }
   })
 
@@ -28,16 +29,21 @@ function parseInput (input) {
 function evolve (fish) {
   const evolvedFish = JSON.parse(JSON.stringify(fish))
 
-  const spawnedFish = []
+  let spawnedFish = 0
   evolvedFish.forEach(fish => {
     fish.t--
     if (fish.t === -1) {
       fish.t = 6
-      spawnedFish.push({ t: 8 })
+      spawnedFish += fish.c
     }
   })
 
-  return [...evolvedFish, ...spawnedFish]
+  const fishGroup = {
+    t: 8,
+    c: spawnedFish
+  }
+
+  return [...evolvedFish, fishGroup]
 }
 
 async function solveForFirstStar (input) {
@@ -50,13 +56,26 @@ async function solveForFirstStar (input) {
     days.push(fish)
   }
 
-  const solution = fish.length
+  const solution = fish.reduce((acc, f) => {
+    return acc + f.c
+  }, 0)
   report('Input:', input)
   report('Solution 1:', solution)
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const startingFish = parseInput(input)
+
+  let fish = startingFish
+  const days = [fish]
+  while (days.length <= 256) {
+    fish = evolve(fish)
+    days.push(fish)
+  }
+
+  const solution = fish.reduce((acc, f) => {
+    return acc + f.c
+  }, 0)
   report('Solution 2:', solution)
 }
 

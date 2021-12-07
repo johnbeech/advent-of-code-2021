@@ -40,16 +40,11 @@ async function solveForFirstStar (input) {
 
   const solution = Math.min(...fuelDistances)
   report('Solution 1:', solution)
+  report('Modes', stats.mode(positions))
 }
 
-function calcFuelCost (dist) {
-  let res = 0
-  let n = 0
-  while (n <= dist) {
-    res += n
-    n++
-  }
-  return res
+function calcFuelCost (n) {
+  return n * (n + 1) / 2
 }
 
 async function solveForSecondStar (input) {

@@ -29,19 +29,6 @@ async function solveForFirstStar (input) {
   const crabs = parseCrabs(input)
 
   const positions = crabs.map(c => c.x)
-
-  console.log('sum: %s', stats.sum(positions))
-  console.log('mean: %s', stats.mean(positions))
-  console.log('median: %s', stats.median(positions))
-  console.log('mode: %s', stats.mode(positions))
-  console.log('min %s', Math.min(...positions))
-  console.log('max %s', Math.max(...positions))
-  console.log('variance: %s', stats.variance(positions) / 100)
-  console.log('standard deviation: %s', stats.stdev(positions))
-  console.log('sample standard deviation: %s', stats.sampleStdev(positions))
-  console.log('85th percentile: %s', stats.percentile(positions, 0.85))
-  console.log('histogram:', stats.histogram(positions, 10))
-
   const min = Math.min(...positions)
   const max = Math.max(...positions)
   const fuelDistances = []
@@ -56,7 +43,23 @@ async function solveForFirstStar (input) {
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const crabs = parseCrabs(input)
+
+  const positions = crabs.map(c => c.x)
+  const min = Math.min(...positions)
+  const max = Math.max(...positions)
+  const fuelDistances = []
+  while (fuelDistances.length < max) {
+    const moves = crabs.map(c => {
+      const dist = Math.abs((min + fuelDistances.length) - c.x)
+      const fuelCost = Math.pow(dist, 2)
+      return fuelCost
+    })
+    const distance = stats.sum(moves)
+    fuelDistances.push(distance)
+  }
+
+  const solution = Math.min(...fuelDistances)
   report('Solution 2:', solution)
 }
 

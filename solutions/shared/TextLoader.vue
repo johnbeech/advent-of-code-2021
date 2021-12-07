@@ -1,6 +1,6 @@
 <template>
   <div class="text loader">
-    <pre v-if="text"><code>{{ text }}</code></pre>
+    <pre><code>{{ text || localText }}</code></pre>
     <pre v-if="error"><code>Error: {{ error }}</code></pre>
   </div>
 </template>
@@ -15,12 +15,20 @@ import 'prismjs/components/prism-markup'
 export default {
   data() {
     return {
-      text: '',
+      localText: '',
       error: ''
     }
+  },  
+  model: {
+    prop: 'text',
+    event: 'change'
   },
   props: {
     file: {
+      type: String,
+      default: ''
+    },
+    text: {
       type: String,
       default: ''
     }
@@ -32,7 +40,8 @@ export default {
       try {
         const response = LOCAL_AOC_DEV ? loadLocal(file) : load(`./${file}`)
         const { data } = await response
-        this.text = data
+        this.localText = data
+        this.$emit('change', data)
       } catch (ex) {
         this.error = ex.message
       }
@@ -45,7 +54,7 @@ export default {
     },
     loadLocal(file) {
       const { $page } = this
-      const filepath = [this.$page.regularPath, file].join('')
+      const filepath = [$page.regularPath, file].join('')
       return this.load(`http://localhost:8585${filepath}`)
     }
   }

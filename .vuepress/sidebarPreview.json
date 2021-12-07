@@ -32,6 +32,10 @@
     "path": "solutions/day7/"
   },
   {
+    "title": "Icons",
+    "path": "solutions/shared/Icons.md"
+  },
+  {
     "title": "Day N: Template",
     "path": "solutions/template/"
   }

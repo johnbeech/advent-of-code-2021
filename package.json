@@ -17,6 +17,9 @@
   "author": "John Beech",
   "license": "ISC",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^2.0.6",
     "express": "^4.16.4",
     "pre-push": "*",
     "promise-path": "*",

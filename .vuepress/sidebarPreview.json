@@ -24,6 +24,14 @@
     "path": "solutions/day5/"
   },
   {
+    "title": "Day 6: Lanternfish",
+    "path": "solutions/day6/"
+  },
+  {
+    "title": "Day 7: The Treachery of Whales",
+    "path": "solutions/day7/"
+  },
+  {
     "title": "Day N: Template",
     "path": "solutions/template/"
   }

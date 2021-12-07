@@ -6,7 +6,7 @@
   "main": "run.js",
   "scripts": {
     "start": "npm run test && node run.js",
-    "webserver": "npm run docs:dev -s",
+    "webserver": "./local-dev.sh",
     "test": "npm run lint",
     "lint": "standard --fix",
     "build": "vuepress build && ./build.sh",
@@ -24,10 +24,11 @@
     "stats-lite": "*"
   },
   "devDependencies": {
-    "vuepress": "^1.8.2",
-    "@vuepress/plugin-register-components": "^1.8.2",
     "@connected-web/md2json": "^1.1.0",
+    "@vuepress/plugin-register-components": "^1.8.2",
     "axios": "^0.24.0",
-    "gh-pages": "^3.2.3"
+    "gh-pages": "^3.2.3",
+    "http-server": "^14.0.0",
+    "vuepress": "^1.8.2"
   }
 }

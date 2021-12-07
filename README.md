@@ -1,6 +1,6 @@
 # Advent of Code 2021
 
-My solutions for Advent of Code 2021.
+My solutions for [Advent of Code 2021](https://adventofcode.com/2021).
 
 ## Setup
 
@@ -25,7 +25,8 @@ Once you have calculated a solution, you should manually submit your answer thro
 
 A local webserver has been provided to browse the solutions, and optionally create web based visualisations to go with the code.
 
-To start the server run: `npm run webserver` - a new hardcoded index.html will be generated each time you browse the index.
+To start the server run: `npm run webserver` - a dynamic webserver will start up allowing for hot-reloading of content edits.
 
-Solutions with visualisations can be browsed online at: https://johnbeech.github.io/advent-of-code-2021/solutions/
+Solutions with visualisations can be browsed online at: 
+- [https://johnbeech.github.io/advent-of-code-2021/](https://johnbeech.github.io/advent-of-code-2021/)
 

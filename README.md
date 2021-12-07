@@ -4,9 +4,7 @@ My solutions for [Advent of Code 2021](https://adventofcode.com/2021).
 
 ## Setup
 
-
 Clone this repo, then run `npm install` to install dependencies.
-
 
 ## Running
 

@@ -10,6 +10,10 @@ async function generateVueConfig() {
     title: logName,
     themeConfig: {
       sidebar: await generateSidebar(),
+      nav: [
+        { text: 'Home', link: '/' },
+        { text: 'Source', link: 'https://github.com/johnbeech/advent-of-code-2021/' }
+      ],
       siteRoot: fromHere('../'),
       env: {
         LOCAL_AOC_DEV: process.env.LOCAL_AOC_DEV

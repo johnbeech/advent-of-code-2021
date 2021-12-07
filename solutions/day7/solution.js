@@ -42,6 +42,16 @@ async function solveForFirstStar (input) {
   report('Solution 1:', solution)
 }
 
+function calcFuelCost (dist) {
+  let res = 0
+  let n = 0
+  while (n <= dist) {
+    res += n
+    n++
+  }
+  return res
+}
+
 async function solveForSecondStar (input) {
   const crabs = parseCrabs(input)
 
@@ -52,7 +62,7 @@ async function solveForSecondStar (input) {
   while (fuelDistances.length < max) {
     const moves = crabs.map(c => {
       const dist = Math.abs((min + fuelDistances.length) - c.x)
-      const fuelCost = Math.pow(dist, 2)
+      const fuelCost = calcFuelCost(dist)
       return fuelCost
     })
     const distance = stats.sum(moves)

@@ -5,7 +5,7 @@ const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
 
 async function run () {
-  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -82,10 +82,7 @@ function parseHeightmap (input) {
   return heightmap
 }
 
-async function solveForFirstStar (input) {
-  const heightmap = parseHeightmap(input)
-  const solution = stats.sum(heightmap.lowPoints.map(p => p.h + 1))
-
+function heightmapToText (heightmap) {
   const output = []
   for (let j = 0; j <= heightmap.height; j++) {
     const line = []
@@ -98,14 +95,42 @@ async function solveForFirstStar (input) {
     }
     output.push(line.join(''))
   }
+  return output.join('\n')
+}
 
-  await write(fromHere('heightmap.txt'), output.join('\n'), 'utf8')
+async function solveForFirstStar (input) {
+  const heightmap = parseHeightmap(input)
 
+  const text = heightmapToText(heightmap)
+  await write(fromHere('heightmap.txt'), text, 'utf8')
+
+  const solution = stats.sum(heightmap.lowPoints.map(p => p.h + 1))
   report('Solution 1:', solution)
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const heightmap = parseHeightmap(input)
+
+  const basins = {}
+  heightmap.locations.forEach(loc => {
+    let lowest = loc
+    let next
+    do {
+      next = lowest.flowDown
+      lowest = next || lowest
+    } while (next)
+    const basin = basins[lowest.key] || []
+    basin.push(loc)
+    basins[lowest.key] = basin
+  })
+
+  const basinList = Object.values(basins)
+  const threeLargest = basinList.sort((a, b) => a.length > b.length ? -1 : 1).slice(0, 3).map(n => n.length)
+
+  console.log('Three largest basins:', threeLargest)
+
+  const solution = threeLargest.reduce((acc, item) => acc * item, 1)
+
   report('Solution 2:', solution)
 }
 

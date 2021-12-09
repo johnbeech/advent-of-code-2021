@@ -64,8 +64,8 @@ function parseHeightmap (input) {
       .sort((a, b) => a.h < b.h ? -1 : 1)
     const ln = neighbours[0]
     const hn = neighbours[neighbours.length - 1]
-    const fd = ln.h < location.h ? ln : false
-    const fu = hn.h > location.h ? hn : false
+    const fd = ln.h <= location.h ? ln : false
+    const fu = hn.h >= location.h ? hn : false
     location.flowDown = fd
     location.flowUp = fu
     console.log('Location:', location.key, location.h,

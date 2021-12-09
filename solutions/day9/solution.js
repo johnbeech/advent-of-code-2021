@@ -5,7 +5,7 @@ const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
 
 async function run () {
-  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -82,15 +82,18 @@ function parseHeightmap (input) {
   return heightmap
 }
 
-function heightmapToText (heightmap) {
+const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+function heightmapToText (heightmap, showBasins) {
   const output = []
   for (let j = 0; j <= heightmap.height; j++) {
     const line = []
     for (let i = 0; i <= heightmap.width; i++) {
       const location = heightmap.get(i, j)
       let symbol = location.h
+      symbol = location.basin ? letters.charAt(location.basin % letters.length) : symbol
       symbol = location.flowUp ? symbol : symbol
       symbol = location.flowDown ? symbol : 'v'
+      symbol = showBasins && location.h === 9 ? ' ' : symbol
       line.push(symbol)
     }
     output.push(line.join(''))
@@ -113,6 +116,9 @@ async function solveForSecondStar (input) {
 
   const basins = {}
   heightmap.locations.forEach(loc => {
+    if (loc.h === 9) {
+      return
+    }
     let lowest = loc
     let next
     do {
@@ -127,9 +133,19 @@ async function solveForSecondStar (input) {
   const basinList = Object.values(basins)
   const threeLargest = basinList.sort((a, b) => a.length > b.length ? -1 : 1).slice(0, 3).map(n => n.length)
 
+  basinList.forEach((b, i) => {
+    b.forEach(l => {
+      l.basin = i
+    })
+  })
+
   console.log('Three largest basins:', threeLargest)
 
   const solution = threeLargest.reduce((acc, item) => acc * item, 1)
+
+  const showBasins = true
+  const text = heightmapToText(heightmap, showBasins)
+  await write(fromHere('basinmap.txt'), text, 'utf8')
 
   report('Solution 2:', solution)
 }

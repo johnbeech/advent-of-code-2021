@@ -6,6 +6,6 @@ Find the first illegal character in each corrupted line of the navigation subsys
 
 ## Part 2
 
-(Not yet unlocked)
+Find the completion string for each incomplete line, score the completion strings, and sort the scores. **What is the middle score?**
 
-<template-Viewer />
+<day10-Viewer />

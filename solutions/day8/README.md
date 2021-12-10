@@ -6,6 +6,6 @@
 
 ## Part 2
 
-(Not yet unlocked)
+For each entry, determine all of the wire/segment connections and decode the four-digit output values. **What do you get if you add up all of the output values?**
 
 <day8-Viewer />

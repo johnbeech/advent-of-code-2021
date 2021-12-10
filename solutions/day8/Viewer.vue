@@ -2,10 +2,12 @@
   <div>
     <h3>Seven Segment Display</h3>
 
-    <day8-SegmentDisplay v-model="segment1" :wiremap="wiremap" />
-    <day8-SegmentDisplay v-model="segment2" :wiremap="wiremap" />
-    <day8-SegmentDisplay v-model="segment3" :wiremap="wiremap" />
-    <day8-SegmentDisplay v-model="segment4" :wiremap="wiremap" />
+    <div style="background: black; display: inline-block; padding: 0.5em; border-radius: 0.5em;">
+      <day8-SegmentDisplay v-model="segment1" :wiremap="wiremap" />
+      <day8-SegmentDisplay v-model="segment2" :wiremap="wiremap" />
+      <day8-SegmentDisplay v-model="segment3" :wiremap="wiremap" />
+      <day8-SegmentDisplay v-model="segment4" :wiremap="wiremap" />
+    </div>
 
     <h3>Wiremap</h3>
 
@@ -15,13 +17,14 @@
 
     <p>Solution 1: <b>{{ solution1 }}</b></p>
 
-    <div v-for="puzzle in puzzles" :key="puzzle.codes.map(n => n.code).join('-')"
+    <div v-for="(puzzle, puzzleIndex) in puzzles" :key="puzzle.codes.map(n => n.code).join('-')"
         v-on:click="selectPuzzle(puzzle)">
-      <div>
+      <div style="display: none;">
         <span v-for="(item, index) in puzzle.codes" :key="`${item.code}-${index}`"
           class="puzzle code">#{{ item.number || '?' }} : {{ item.code }}</span>
       </div>
       <div>
+        <span class="puzzle number">{{ puzzleIndex }}</span>
         <span v-for="(item, index) in puzzle.output" :key="`${item.code}-${index}`"
           class="puzzle output">#{{ item.number || '?' }} : {{ item.code }}</span>
       </div>
@@ -95,6 +98,18 @@ function solveForFirstStar(puzzles) {
   }, 0)
 } 
 
+function createDefaultWiremap() {
+  return {
+    'a': 'a',
+    'b': 'b',
+    'c': 'c',
+    'd': 'd',
+    'e': 'e',
+    'f': 'f',
+    'g': 'g'
+  }
+}
+
 export default {
   data() {
     return {
@@ -105,15 +120,7 @@ export default {
       segment2: [],
       segment3: [],
       segment4: [],
-      wiremap: {
-        'a': 'a',
-        'b': 'b',
-        'c': 'c',
-        'd': 'd',
-        'e': 'e',
-        'f': 'f',
-        'g': 'g'
-      }
+      wiremap: createDefaultWiremap()
     }
   },
   computed: {
@@ -130,12 +137,24 @@ export default {
       this.segment2 = puzzle.output[1].code.split('')
       this.segment3 = puzzle.output[2].code.split('')
       this.segment4 = puzzle.output[3].code.split('')
+      this.wiremap = createDefaultWiremap()
     }
   }
 }
 </script>
 
 <style scoped>
+.puzzle.number {
+  display: inline-block;
+  margin: 0.2em 0.2em;
+  padding: 0.1em 0.2em;
+  border: 0.1em;
+  background: mediumspringgreen;
+  border-radius: 0.2em;
+  color: black;
+  font-size: 0.8em;
+  font-weight: bold;
+}
 .puzzle.code {
   display: inline-block;
   margin: 0.2em 0.2em;

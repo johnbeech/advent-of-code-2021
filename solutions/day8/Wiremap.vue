@@ -51,6 +51,14 @@ export default {
       return this.wiremap || this.localWires || createDefaultWiremap()
     }
   },
+  watch: {
+    lastSource() {
+      this.$forceUpdate()
+    },
+    lastTarget() {
+      this.$forceUpdate()
+    }
+  },
   methods: {
     rewireSource(wire) {
       this.wireSource = wire
@@ -91,6 +99,10 @@ export default {
       this.localWires = newWiremap
       this.$emit('change', newWiremap)
       this.$forceUpdate()
+      setTimeout(() => {
+        this.lastSource = false
+        this.lastTarget = false
+      }, 1500)
     }
   }
 }
@@ -117,6 +129,7 @@ export default {
   border-radius: 0.2em;
   color: rgba(255, 255, 255, 0.4);
   background: #333;
+  transition: background-color 0.8s ease-in-out;
 }
 .wire:hover {
   cursor: pointer;
@@ -126,14 +139,17 @@ export default {
   background: #900;
 }
 .wire.remapped:hover {
-  background: #B33;
+  background: turquoise;
+  transition: background-color 0.1s ease-in-out;
 }
 .wire.warm {
   background: turquoise;
   color: rgba(0, 0, 0, 0.4);
+  transition: background-color 0.2s ease-in-out;
 }
 .wire.hot {
   background: yellow;
   color: rgba(0, 0, 0, 0.4);
+  transition: background-color 0.2s ease-in-out;
 }
 </style>

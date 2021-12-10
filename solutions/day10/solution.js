@@ -10,6 +10,13 @@ const illegalCharScores = {
   '>': 25137
 }
 
+const completionScores = {
+  ')': 1,
+  ']': 2,
+  '}': 3,
+  '>': 4
+}
+
 const openSymbols = ['(', '[', '{', '<']
 const closeSymbols = [')', ']', '}', '>']
 
@@ -59,6 +66,16 @@ function checkForCorrupt (puzzle) {
       }
     }
   })
+  puzzle.opens = opens
+  let score = 0
+  while (puzzle.opens.length > 0) {
+    const openIndex = opens.pop()
+    const matchingBracket = closeSymbols[openIndex]
+    const matchingScore = completionScores[matchingBracket]
+    score = (score * 5) + matchingScore
+    puzzle.symbols.push(matchingBracket)
+    puzzle.score = score
+  }
   return corrupt
 }
 
@@ -82,7 +99,21 @@ async function solveForFirstStar (input) {
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const puzzles = parseLines(input)
+
+  puzzles.forEach(puzzle => {
+    puzzle.incomplete = checkForIncomplete(puzzle)
+    puzzle.corrupt = checkForCorrupt(puzzle)
+  })
+
+  const completablePuzzles = puzzles
+    .filter(p => p.incomplete && !p.corrupt)
+
+  const middle = Math.floor(completablePuzzles.length / 2)
+
+  const solution = completablePuzzles
+    .sort((a, b) => a.score > b.score ? -1 : 1)[middle].score
+
   report('Solution 2:', solution)
 }
 

@@ -181,6 +181,7 @@ export default {
   color: rgba(255, 255, 255, 0.4);
   background: #333;
   font-size: 0.5em;
+  transition: background-color 0.2s ease-in-out;
 }
 .cell.x {
   color: rgba(255, 255, 255, 0.1);

@@ -2,7 +2,7 @@
   <div class="display">
     <div v-for="cell in cells" :key="cell.key"
       :class="`cell ${cell.char} ${cell.on ? 'on' : 'off'}`"
-      v-on:click="illuminateGroup(cell.char)">{{ wiremap[cell.char] || 'x' }}</div>
+      v-on:click="illuminateGroup(cell.char)">{{ cell.char }} {{ wiremap[cell.char] || 'x' }}</div>
   </div>
 </template>
 
@@ -162,6 +162,9 @@ export default {
   overflow: hidden;
   width: 120px;
   height: 210px;
+  background: black;
+  border-radius: 0.5em;
+  margin: 0.5em;
 }
 .display > .cell {
   display: inline-flex;
@@ -177,9 +180,11 @@ export default {
   border-radius: 0.2em;
   color: rgba(255, 255, 255, 0.4);
   background: #333;
+  font-size: 0.5em;
 }
 .cell.x {
-  opacity: 0.1;
+  color: rgba(255, 255, 255, 0.1);
+  background: #333;
 }
 .cell.on {
   background: yellow;

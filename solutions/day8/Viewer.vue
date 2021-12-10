@@ -2,16 +2,21 @@
   <div>
     <h3>Seven Segment Display</h3>
 
-    <day8-SegmentDisplay />
-    <day8-SegmentDisplay />
-    <day8-SegmentDisplay />
-    <day8-SegmentDisplay />
+    <day8-SegmentDisplay v-model="segment1" :wiremap="wiremap" />
+    <day8-SegmentDisplay v-model="segment2" :wiremap="wiremap" />
+    <day8-SegmentDisplay v-model="segment3" :wiremap="wiremap" />
+    <day8-SegmentDisplay v-model="segment4" :wiremap="wiremap" />
+
+    <h3>Wiremap</h3>
+
+    <day8-Wiremap v-model="wiremap" />
 
     <h3>Puzzles</h3>
 
     <p>Solution 1: <b>{{ solution1 }}</b></p>
 
-    <div v-for="puzzle in puzzles" :key="puzzle.codes.map(n => n.code).join('-')">
+    <div v-for="puzzle in puzzles" :key="puzzle.codes.map(n => n.code).join('-')"
+        v-on:click="selectPuzzle(puzzle)">
       <div>
         <span v-for="(item, index) in puzzle.codes" :key="`${item.code}-${index}`"
           class="puzzle code">#{{ item.number || '?' }} : {{ item.code }}</span>
@@ -94,7 +99,21 @@ export default {
   data() {
     return {
       inputText: '',
-      solution1: '?'
+      solution1: '?',
+      selectedPuzzle: false,
+      segment1: [],
+      segment2: [],
+      segment3: [],
+      segment4: [],
+      wiremap: {
+        'a': 'a',
+        'b': 'b',
+        'c': 'c',
+        'd': 'd',
+        'e': 'e',
+        'f': 'f',
+        'g': 'g'
+      }
     }
   },
   computed: {
@@ -102,6 +121,15 @@ export default {
       const puzzles = parseInput(this.inputText)
       this.solution1 = solveForFirstStar(puzzles)
       return puzzles
+    }
+  },
+  methods: {
+    selectPuzzle(puzzle) {
+      this.selectedPuzzle = puzzle
+      this.segment1 = puzzle.output[0].code.split('')
+      this.segment2 = puzzle.output[1].code.split('')
+      this.segment3 = puzzle.output[2].code.split('')
+      this.segment4 = puzzle.output[3].code.split('')
     }
   }
 }

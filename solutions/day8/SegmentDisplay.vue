@@ -2,7 +2,7 @@
   <div class="display">
     <div v-for="cell in cells" :key="cell.key"
       :class="`cell ${cell.char} ${cell.on ? 'on' : 'off'}`"
-      v-on:click="illuminateGroup(cell.char)">{{ cell.char }}</div>
+      v-on:click="illuminateGroup(cell.char)">{{ wiremap[cell.char] || 'x' }}</div>
   </div>
 </template>
 
@@ -69,9 +69,36 @@ function createCellSegments() {
 }
 
 export default {
+  model: {
+    prop: 'segments',
+    event: 'change'
+  },
+  props: {
+    segments: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    wiremap: {
+      type: Object,
+      default () {
+        return {
+          'a': 'a',
+          'b': 'b',
+          'c': 'c',
+          'd': 'd',
+          'e': 'e',
+          'f': 'f',
+          'g': 'g'
+        }
+      }
+    }
+  },
   data() {
     return {
-      cells: createCellSegments()
+      cells: createCellSegments(),
+      localSegments: []
     }
   },
   computed: {
@@ -80,7 +107,21 @@ export default {
         cellMap[cell.key] = cell
         return cellMap
       }, {})
+    },
+    illuminatedSegments() {
+      return this.segments || this.localSegments || []
     }
+  },
+  watch: {
+    segments() {
+      this.illuminateCells()
+    },
+    wiremap() {
+      this.illuminateCells()
+    }
+  },
+  mounted() {
+    this.illuminateCells()
   },
   methods: {
     cellGroup(key) {
@@ -92,15 +133,25 @@ export default {
       })
     },
     illuminateGroup(key) {
+      const localSegments = this.localSegments
       if (key === 'x') {
-        return this.deluminate()
+        this.deluminate()
+        while (localSegments.length > 0) {
+          localSegments.pop()
+        }
+      } else  if (!localSegments.includes(key)) {
+        localSegments.push(key)
       }
-      const group = this.cellGroup(key)
-      group.forEach(cell => {
-        cell.on = !cell.on
-      })
-      console.log('Illuminate:', key, group)
+      this.$emit('change', localSegments)
+      this.illuminateCells()
     },
+    illuminateCells() {
+      const segments = this.illuminatedSegments
+      this.cells.forEach(cell => {
+        const remappedChar = this.wiremap[cell.char]
+        cell.on = segments.includes(remappedChar)
+      })
+    }
   }
 }
 </script>

@@ -24,9 +24,13 @@ async function generateSidebar() {
     }
   }))
 
-  await write(here('sidebarPreview.json'), JSON.stringify(sidebar, null, 2), 'utf8')
+  const filteredSidebar = sidebar
+    .filter(n => !n.path.includes('template'))
+    .sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }))
 
-  return sidebar.filter(n => n.title !== 'Day N: Template')
+  await write(here('sidebarPreview.json'), JSON.stringify(filteredSidebar, null, 2), 'utf8')
+
+  return filteredSidebar
 }
 
 module.exports = generateSidebar

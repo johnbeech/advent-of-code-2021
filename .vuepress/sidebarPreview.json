@@ -8,10 +8,6 @@
     "path": "solutions/day1/"
   },
   {
-    "title": "Day 10: Syntax Scoring",
-    "path": "solutions/day10/"
-  },
-  {
     "title": "Day 2: Dive!",
     "path": "solutions/day2/"
   },
@@ -44,11 +40,11 @@
     "path": "solutions/day9/"
   },
   {
-    "title": "Icons",
-    "path": "solutions/shared/Icons.md"
+    "title": "Day 10: Syntax Scoring",
+    "path": "solutions/day10/"
   },
   {
-    "title": "Day N: Template",
-    "path": "solutions/template/"
+    "title": "Icons",
+    "path": "solutions/shared/Icons.md"
   }
 ]

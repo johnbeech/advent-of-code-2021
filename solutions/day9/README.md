@@ -6,6 +6,6 @@ Find all of the low points on your heightmap. **What is the sum of the risk leve
 
 ## Part 2
 
-(Not yet unlocked)
+**What do you get if you multiply together the sizes of the three largest basins?**
 
 <day9-Viewer />

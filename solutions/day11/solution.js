@@ -16,7 +16,8 @@ function parseOctopusGrid (input) {
     height: 0,
     locations: [],
     map: {},
-    flashes: 0
+    flashes: 0,
+    flashesThisStep: 0
   }
 
   const { locations, map } = octopusMap
@@ -102,6 +103,8 @@ function gridToText (grid) {
 function evolve (octopusGrid) {
   const { locations } = octopusGrid
 
+  octopusGrid.flashesThisStep = 0
+
   locations.forEach(loc => {
     loc.energy = loc.energy + 1
   })
@@ -123,9 +126,10 @@ function evolve (octopusGrid) {
   locations.forEach(loc => {
     if (loc.energy > 9) {
       loc.energy = 0
-      octopusGrid.flashes = octopusGrid.flashes + 1
+      octopusGrid.flashesThisStep = octopusGrid.flashesThisStep + 1
     }
   })
+  octopusGrid.flashes = octopusGrid.flashes + octopusGrid.flashesThisStep
 }
 
 async function solveForFirstStar (input) {
@@ -147,7 +151,22 @@ async function solveForFirstStar (input) {
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const octupusGrid = parseOctopusGrid(input)
+
+  const steps = []
+  const snapshots = []
+  while (octupusGrid.flashesThisStep < 100) {
+    evolve(octupusGrid)
+    steps.push(octupusGrid.flashesThisStep)
+    if (steps.length % 10 === 0) {
+      console.log('Flashes at step ', steps.length, ' : ', octupusGrid.flashesThisStep)
+      snapshots.push(gridToText(octupusGrid))
+    }
+  }
+
+  await write(fromHere('snapshots.txt'), snapshots.join('\n\n'), 'utf8')
+
+  const solution = steps.length
   report('Solution 2:', solution)
 }
 

@@ -24,6 +24,10 @@
         <rect x="-10" width="20" y="-5" height="10" fill="orange" />
         <circle cx="10" r="5" fill="orange" />
       </g>
+      <text :x="viewWidth - 10" y="20"
+        width="100" height="20"
+        fill="white" class="label"
+        text-anchor="end">Downwards count: {{ solution1.diffCount }}</text>
     </svg>
 
     <h3>My Input</h3>
@@ -130,6 +134,8 @@ export default {
       const sliceWidth = 74
       const depthScans = depths.slice(sliceStart, sliceStart + sliceWidth)
 
+      this.solution1.diffCount = depths.slice(0, sliceStart).filter(d => d.diff > 0).length
+
       while (depthScans.length < sliceWidth) {
         depthScans.push(depthScans[depthScans.length - 1])
       }
@@ -155,5 +161,10 @@ rect.up {
 }
 rect.down {
   fill: brown;
+}
+text.label {
+  font-weight: bold;
+  text-align: right;
+  font-family: monospace;
 }
 </style>

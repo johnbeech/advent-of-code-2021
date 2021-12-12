@@ -6,6 +6,8 @@
 
 ## Part 2
 
-(Not yet unlocked)
+Big caves can be visited any number of times, a single small cave can be visited at most twice, and the remaining small caves can be visited at most once.
+
+**Given these new rules, how many paths through this cave system are there?**
 
 <template-Viewer />

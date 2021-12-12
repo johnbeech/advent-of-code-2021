@@ -171,8 +171,8 @@ export default {
       this.recaculateSizes('scrollDirection')
     },
     moveTo(x, y) {
-      this.offsetX = x
-      this.offsetY = y
+      this.offsetX = x * this.zoom
+      this.offsetY = y * this.zoom
     },
     setZoom(newZoom) {
       const { zoom, cursorX, cursorY, offsetX, offsetY, maxZoom, minZoom } = this

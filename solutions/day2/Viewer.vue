@@ -2,9 +2,9 @@
   <div>
     <shared-PanAndZoom class="submarine-tracker" :centerContent="true" v-on:ready="registerPanAndZoom">
       <div v-for="(marker, idx) in markers" :key="`marker-${idx}`"
-        :style="markerStyle(marker)" class="marker">X</div>
+        :style="markerStyle(marker)" class="marker"></div>
       <div class="submarine" :style="subStyle">
-        <label>SUB</label>
+        <label>{{ sub.text }}</label>
       </div>
     </shared-PanAndZoom>
 
@@ -78,26 +78,39 @@ export default {
       sub: {
         x: 0,
         y: 0,
+        text: 'SUB',
         aim: 0,
         rotation: 0,
         wobble: 0
       },
+      running: false,
       subStyle: '',
       instructions: [],
       markers: [{ x: 0, y: 0 }],
-      panAndZoom: false
+      panAndZoom: false,
+      animator: false
     }
   },
   mounted() {
-    setInterval(() => {
+    this.animator = setInterval(() => {
       this.advance()
     }, 10)
   },
   methods: {
     advance() {
+      if (!this.running) {
+        return
+      }
       const { sub, instructions } = this
       const next = instructions.shift()
       if (!next) {
+        clearInterval(this.animator)
+        sub.text = `${sub.x} x ${sub.y}`
+        sub.x = 0
+        sub.y = 0
+        sub.aim = 0
+        this.computeSubstyle()
+        this.running = false
         return
       }
       const command = part2Commands[next.direction]
@@ -111,7 +124,7 @@ export default {
     },
     computeSubstyle() {
       const { sub, panAndZoom } = this
-      sub.rotation = Math.cos(sub.x / sub.y * 0.01) * 180 / Math.PI
+      sub.rotation = Math.cos(sub.x / sub.aim * 0.01) * 180 / Math.PI
       const style = `position: absolute; left: ${sub.x}px; top: ${sub.y / 100}px; transform: rotate(${sub.rotation + sub.wobble}deg)`
       this.subStyle = style
       if (panAndZoom) {
@@ -130,6 +143,7 @@ export default {
     inputText() {
       const instructions = parseInstructions(this.inputText)
       this.instructions = instructions
+      this.running = true
     }
   }
 }
@@ -145,17 +159,17 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 10px;
+  border-radius: 15px;
   background: orange;
-  width: 60px;
-  height: 20px;
-  margin-left: -30px;
-  margin-top: -10px;
+  width: 80px;
+  height: 30px;
+  margin-left: -40px;
+  margin-top: -15px;
   overflow: hidden;
   text-align: center;
 }
 .submarine > label {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
 }
 .marker {

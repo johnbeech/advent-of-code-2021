@@ -11,7 +11,7 @@
       </li>
     </ul>
 
-    <h3>Visualisation</h3>
+    <h2>Visualisation</h2>
 
     <svg v-if="solution1.depths" :viewBox="`0 0 ${viewWidth} ${viewHeight}`" xmlns="http://www.w3.org/2000/svg" width="100%">
       <rect :width="viewWidth" :height="viewHeight" fill="navy" />

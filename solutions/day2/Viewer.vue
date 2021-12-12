@@ -1,5 +1,16 @@
 <template>
   <div>
+    <ul>
+      <li>
+        <label>Solution 1:</label>
+        <b>{{ solution1.text }}</b>
+      </li>
+      <li>
+        <label>Solution 2:</label>
+        <b>{{ solution2.text }}</b>
+      </li>
+    </ul>
+
     <shared-PanAndZoom class="submarine-tracker" :centerContent="true" v-on:ready="registerPanAndZoom">
       <div v-for="(marker, idx) in markers" :key="`marker-${idx}`"
         :style="markerStyle(marker)" class="marker"></div>
@@ -71,6 +82,47 @@ function aimUp ({ distance }, position) {
   position.aim = position.aim - distance
 }
 
+
+async function solveForFirstStar (input) {
+  const instructions = parseInstructions(input)
+  const position = {
+    x: 0,
+    y: 0,
+    aim: 0
+  }
+  while (instructions.length > 0) {
+    const next = instructions.shift()
+    const command = part1Commands[next.direction]
+    command(next, position)
+  }
+
+  const value = position.x * position.y
+  return {
+    value,
+    text: `${position.x} x ${position.y} = ${value}`
+  }
+}
+
+async function solveForSecondStar (input) {
+  const instructions = parseInstructions(input)
+  const position = {
+    x: 0,
+    y: 0,
+    aim: 0
+  }
+  while (instructions.length > 0) {
+    const next = instructions.shift()
+    const command = part2Commands[next.direction]
+    command(next, position)
+  }
+
+  const value = position.x * position.y
+  return {
+    value,
+    text: `${position.x} x ${position.y} = ${value}`
+  }
+}
+
 export default {
   data: () => {
     return {
@@ -88,7 +140,9 @@ export default {
       instructions: [],
       markers: [{ x: 0, y: 0 }],
       panAndZoom: false,
-      animator: false
+      animator: false,
+      solution1: false,
+      solution2: false
     }
   },
   mounted() {
@@ -140,8 +194,11 @@ export default {
     }
   },
   watch: {
-    inputText() {
-      const instructions = parseInstructions(this.inputText)
+    async inputText() {
+      const { inputText } = this
+      const instructions = parseInstructions(inputText)
+      this.solution1 = await solveForFirstStar(inputText)
+      this.solution2 = await solveForSecondStar(inputText)
       this.instructions = instructions
       this.running = true
     }

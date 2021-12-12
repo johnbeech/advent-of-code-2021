@@ -11,6 +11,8 @@
       </li>
     </ul>
 
+    <h2>Visualisation</h2>
+
     <shared-PanAndZoom class="submarine-tracker" :centerContent="true" v-on:ready="registerPanAndZoom">
       <div v-for="(marker, idx) in markers" :key="`marker-${idx}`"
         :style="markerStyle(marker)" class="marker"></div>

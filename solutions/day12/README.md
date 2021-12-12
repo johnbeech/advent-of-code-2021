@@ -10,4 +10,4 @@ Big caves can be visited any number of times, a single small cave can be visited
 
 **Given these new rules, how many paths through this cave system are there?**
 
-<template-Viewer />
+<day12-Viewer />

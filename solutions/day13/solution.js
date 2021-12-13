@@ -103,6 +103,7 @@ async function printPaper (filename, paper) {
 
   const result = output.join('\n')
   await write(fromHere(filename), result, 'utf8')
+  return result
 }
 
 async function solveForFirstStar (input) {
@@ -121,8 +122,12 @@ async function solveForFirstStar (input) {
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
-  report('Solution 2:', solution)
+  let paper = parseOrigamiInstructions(input)
+  while (paper.folds.length > 0) {
+    paper = fold(paper)
+  }
+  const solution = await printPaper('solution2.txt', paper)
+  report('Solution 2:', `\n${solution.replace(/\./g, ' ')}`)
 }
 
 run()

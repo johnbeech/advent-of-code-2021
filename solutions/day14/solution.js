@@ -4,7 +4,7 @@ const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
 
 async function run () {
-  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -12,13 +12,25 @@ async function run () {
 
 function parsePolymerInstructions (input) {
   const lines = input.split('\n').map(n => n.trim()).filter(n => n)
-  const polymerTemplate = lines.shift().split('')
+  const polymerTemplate = lines.shift()
 
   const pairInsertionRules = lines.map(line => {
-    const [left, c] = line.split(' -> ')
-    const [a, b] = left.split('')
+    const [pair, insert] = line.split(' -> ')
+    const [l, r] = pair.split('')
+    const left = [l, insert].join('')
+    const right = [insert, r].join('')
     return {
-      a, b, c
+      pair,
+      insert,
+      left,
+      right,
+      count: 0
+    }
+  })
+
+  pairInsertionRules.forEach(rule => {
+    if (polymerTemplate.includes(rule.pair)) {
+      rule.count++
     }
   })
 
@@ -28,91 +40,80 @@ function parsePolymerInstructions (input) {
   }
 }
 
-function splitPolymers (instructions) {
-  const { polymerTemplate, pairInsertionRules } = instructions
-  const template = polymerTemplate
-  const rules = pairInsertionRules
-  const newTemplate = []
+function splitPolymer (instructions) {
+  const { pairInsertionRules, polymerTemplate } = instructions
 
-  template.forEach((k, i) => {
-    newTemplate.push(k)
-    const next = template[i + 1]
-    if (next) {
-      const rule = rules.filter(n => n.a === k && n.b === next)[0]
-      newTemplate.push(rule.c)
-    }
-  })
-
-  return {
-    polymerTemplate: newTemplate,
-    pairInsertionRules: rules
-  }
-}
-
-function findLowestAndHighest (list) {
-  const map = list.reduce((acc, item) => {
-    acc[item] = acc[item] ? acc[item] + 1 : 1
+  const map = pairInsertionRules.reduce((acc, item) => {
+    acc[item.pair] = JSON.parse(JSON.stringify(item))
     return acc
   }, {})
 
-  const sorted = Object.entries(map).sort((a, b) => a[1] < b[1] ? -1 : 1)
-  const lowest = sorted[0]
-  const highest = sorted[sorted.length - 1]
+  pairInsertionRules.forEach(rule => {
+    const { count } = rule
+    if (count) {
+      const left = map[rule.left]
+      if (left) {
+        left.count = left.count + count
+      }
+      const right = map[rule.right]
+      if (right) {
+        right.count = right.count + count
+      }
+      map[rule.pair].count = map[rule.pair].count - count
+    }
+  })
+
+  const charMap = {}
+  Object.values(map).forEach(rule => {
+    const [c] = rule.pair.split('')
+    charMap[c] = charMap[c] ? charMap[c] + rule.count : rule.count
+  })
+  const lastChar = polymerTemplate.split('').pop()
+  charMap[lastChar] = charMap[lastChar] + 1
+
+  const min = Math.min(...Object.values(charMap))
+  const max = Math.max(...Object.values(charMap))
+
   return {
-    lowest,
-    highest,
-    map
+    pairInsertionRules: Object.values(map),
+    polymerTemplate,
+    charMap,
+    min,
+    max
   }
 }
 
 async function solveForFirstStar (input) {
   const instructions = parsePolymerInstructions(input)
+
   report('Instructions:', instructions)
 
-  let split = instructions
   const splits = []
+  let polymer = instructions
   while (splits.length < 10) {
-    split = splitPolymers(split)
-    splits.push(split)
-    console.log(split.polymerTemplate.join(''))
+    polymer = splitPolymer(polymer)
+    splits.push(polymer)
+    console.log(polymer.pairInsertionRules)
   }
 
-  const lastSplit = split
-  const { lowest, highest } = findLowestAndHighest(lastSplit.polymerTemplate)
-  const solution = highest[1] - lowest[1]
+  console.log('Polymer', splits.length, 'Min:', polymer.min, 'Max:', polymer.max, polymer.charMap)
+  const solution = polymer.max - polymer.min
   report('Solution 1:', solution)
-}
-
-function diffMapValues (a, b) {
-  const result = {}
-
-  Object.keys(a).forEach(k => {
-    result[k] = b[k] - a[k]
-  })
-
-  return result
 }
 
 async function solveForSecondStar (input) {
   const instructions = parsePolymerInstructions(input)
   report('Instructions:', instructions)
 
-  let split = instructions
-  let previousMap
   const splits = []
-  while (splits.length < 10) {
-    split = splitPolymers(split)
-    splits.push(split)
-    const { map } = findLowestAndHighest(split.polymerTemplate)
-    if (previousMap) {
-      console.log('Step diff', diffMapValues(previousMap, map))
-    }
-    previousMap = map
+  let polymer = instructions
+  while (splits.length < 40) {
+    polymer = splitPolymer(polymer)
+    splits.push(polymer)
   }
 
-  const lastSplit = split
-  const { lowest, highest } = findLowestAndHighest(lastSplit.polymerTemplate)
-  const solution = highest[1] - lowest[1]
+  console.log('Polymer', splits.length, 'Min:', polymer.min, 'Max:', polymer.max, polymer.charMap)
+  const solution = polymer.max - polymer.min
   report('Solution 2:', solution)
 }
 

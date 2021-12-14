@@ -4,7 +4,7 @@ const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
 
 async function run () {
-  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -58,10 +58,10 @@ function findLowestAndHighest (list) {
   const sorted = Object.entries(map).sort((a, b) => a[1] < b[1] ? -1 : 1)
   const lowest = sorted[0]
   const highest = sorted[sorted.length - 1]
-  console.log('Values:', map)
   return {
     lowest,
-    highest
+    highest,
+    map
   }
 }
 
@@ -70,8 +70,8 @@ async function solveForFirstStar (input) {
   report('Instructions:', instructions)
 
   let split = instructions
-  const splits = [split]
-  while (splits.length <= 10) {
+  const splits = []
+  while (splits.length < 10) {
     split = splitPolymers(split)
     splits.push(split)
     console.log(split.polymerTemplate.join(''))
@@ -83,8 +83,36 @@ async function solveForFirstStar (input) {
   report('Solution 1:', solution)
 }
 
+function diffMapValues (a, b) {
+  const result = {}
+
+  Object.keys(a).forEach(k => {
+    result[k] = b[k] - a[k]
+  })
+
+  return result
+}
+
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const instructions = parsePolymerInstructions(input)
+  report('Instructions:', instructions)
+
+  let split = instructions
+  let previousMap
+  const splits = []
+  while (splits.length < 10) {
+    split = splitPolymers(split)
+    splits.push(split)
+    const { map } = findLowestAndHighest(split.polymerTemplate)
+    if (previousMap) {
+      console.log('Step diff', diffMapValues(previousMap, map))
+    }
+    previousMap = map
+  }
+
+  const lastSplit = split
+  const { lowest, highest } = findLowestAndHighest(lastSplit.polymerTemplate)
+  const solution = highest[1] - lowest[1]
   report('Solution 2:', solution)
 }
 

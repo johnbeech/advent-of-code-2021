@@ -14,6 +14,11 @@ function parsePolymerInstructions (input) {
   const lines = input.split('\n').map(n => n.trim()).filter(n => n)
   const polymerTemplate = lines.shift()
 
+  const charMap = polymerTemplate.split('').reduce((acc, char) => {
+    acc[char] = acc[char] ? acc[char] + 1 : 1
+    return acc
+  }, {})
+
   const pairInsertionRules = lines.map(line => {
     const [pair, insert] = line.split(' -> ')
     const [l, r] = pair.split('')
@@ -36,12 +41,13 @@ function parsePolymerInstructions (input) {
 
   return {
     polymerTemplate,
-    pairInsertionRules
+    pairInsertionRules,
+    charMap
   }
 }
 
 function splitPolymer (instructions) {
-  const { pairInsertionRules, polymerTemplate } = instructions
+  const { pairInsertionRules, polymerTemplate, charMap } = instructions
 
   const map = pairInsertionRules.reduce((acc, item) => {
     acc[item.pair] = JSON.parse(JSON.stringify(item))
@@ -54,6 +60,7 @@ function splitPolymer (instructions) {
       const left = map[rule.left]
       if (left) {
         left.count = left.count + count
+        charMap[rule.left.charAt(1)] = charMap[rule.left.charAt(1)] ? charMap[rule.left.charAt(1)] + count : count
       }
       const right = map[rule.right]
       if (right) {
@@ -62,14 +69,6 @@ function splitPolymer (instructions) {
       map[rule.pair].count = map[rule.pair].count - count
     }
   })
-
-  const charMap = {}
-  Object.values(map).forEach(rule => {
-    const [c] = rule.pair.split('')
-    charMap[c] = charMap[c] ? charMap[c] + rule.count : rule.count
-  })
-  const lastChar = polymerTemplate.split('').pop()
-  charMap[lastChar] = charMap[lastChar] + 1
 
   const min = Math.min(...Object.values(charMap))
   const max = Math.max(...Object.values(charMap))

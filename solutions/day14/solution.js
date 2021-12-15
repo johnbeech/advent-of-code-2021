@@ -60,13 +60,13 @@ function splitPolymer (instructions) {
       const left = map[rule.left]
       if (left) {
         left.count = left.count + count
-        charMap[rule.left.charAt(1)] = charMap[rule.left.charAt(1)] ? charMap[rule.left.charAt(1)] + count : count
       }
       const right = map[rule.right]
       if (right) {
         right.count = right.count + count
       }
       map[rule.pair].count = map[rule.pair].count - count
+      charMap[rule.insert] = charMap[rule.insert] ? charMap[rule.insert] + count : count
     }
   })
 

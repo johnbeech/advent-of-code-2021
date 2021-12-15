@@ -11,7 +11,7 @@ async function run () {
   await solveForSecondStar(input)
 }
 
-function parseHeightmap (input) {
+function parseHeightmap (input, multiply = 1) {
   const heightmap = {
     width: 0,
     height: 0,
@@ -21,23 +21,33 @@ function parseHeightmap (input) {
 
   const { locations, map } = heightmap
 
+  function createCell (x, y, value) {
+    const location = {
+      r: value,
+      x,
+      y,
+      key: [x, y].join(':')
+    }
+    locations.push(location)
+    map[location.key] = location
+  }
+
   const lines = input.split('\n').map(n => n.trim()).filter(n => n)
+  const baseHeight = lines.length
+  const baseWidth = lines[0].length
   lines.forEach((line, y) => {
     const cells = line.split('').map(n => Number.parseInt(n))
     cells.forEach((cell, x) => {
-      const location = {
-        h: cell,
-        r: cell,
-        x,
-        y,
-        key: [x, y].join(':')
+      for (let mj = 0; mj < multiply; mj++) {
+        for (let mi = 0; mi < multiply; mi++) {
+          const value = (cell + mj + mi - 1) % 9 + 1
+          createCell(x + mi * baseWidth, y + mj * baseHeight, value)
+        }
       }
-      locations.push(location)
-      map[location.key] = location
-      heightmap.width = Math.max(heightmap.width, x)
     })
-    heightmap.height = Math.max(heightmap.height, y)
   })
+  heightmap.height = baseHeight * multiply
+  heightmap.width = baseWidth * multiply
 
   function get (x, y) {
     const key = [x, y].join(':')
@@ -62,44 +72,14 @@ function parseHeightmap (input) {
   heightmap.get = get
   heightmap.getNeighbours = getNeighbours
 
-  heightmap.grid = heightmapToArray(heightmap, (loc) => loc.r)
-  heightmap.graph = new Graph(heightmap.grid)
-  const { height, width, graph } = heightmap
-  const start = graph.grid[0][0]
-  const end = graph.grid[height][width]
-  const path = astar.search(graph, start, end)
-  heightmap.path = path
-
-  path.forEach(step => {
-    const cell = get(step.y, step.x)
-    cell.visited = true
-    step.cell = cell
-    const { x, y, weight } = step
-    console.log('Step:', { x, y, weight, h: cell.h, r: cell.r, t: cell.r === weight })
-  })
-
-  function pad (s) {
-    s = s + ''
-    while (s.length < 2) {
-      s = s + ' '
-    }
-    return s
-  }
-
-  const gridOutput = heightmapToArray(heightmap, (loc) => loc.h).map(l => l.join('')).join('\n')
-  console.log('Grid:', `\n${gridOutput}`)
-
-  const pathOutput = heightmapToArray(heightmap, (loc) => pad(!loc.visited ? loc.r : loc.r + '.')).map(l => l.join('')).join('\n')
-  console.log('Path:', `\n${pathOutput}`)
-
   return heightmap
 }
 
 function heightmapToArray (heightmap, symbolCallback) {
   const output = []
-  for (let j = 0; j <= heightmap.height; j++) {
+  for (let j = 0; j < heightmap.height; j++) {
     const line = []
-    for (let i = 0; i <= heightmap.width; i++) {
+    for (let i = 0; i < heightmap.width; i++) {
       const location = heightmap.get(i, j)
       const symbol = symbolCallback(location)
       line.push(symbol)
@@ -109,16 +89,52 @@ function heightmapToArray (heightmap, symbolCallback) {
   return output
 }
 
+function pad (s) {
+  s = s + ''
+  while (s.length < 2) {
+    s = s + ' '
+  }
+  return s
+}
+
+function findPathThroughHeightmap (heightmap) {
+  heightmap.grid = heightmapToArray(heightmap, (loc) => loc.r)
+  heightmap.graph = new Graph(heightmap.grid)
+  const { height, width, graph } = heightmap
+  const start = graph.grid[0][0]
+  const end = graph.grid[height - 1][width - 1]
+  const path = astar.search(graph, start, end)
+  heightmap.path = path
+
+  path.forEach(step => {
+    const cell = heightmap.get(step.y, step.x)
+    cell.visited = true
+    step.cell = cell
+  })
+
+  return path
+}
+
 async function solveForFirstStar (input) {
   const heightmap = parseHeightmap(input)
+  const path = findPathThroughHeightmap(heightmap)
 
-  const path = heightmap.path
-  const solution = path.map(n => n.cell.h).reduce((acc, n) => acc + n, 0)
+  const gridOutput = heightmapToArray(heightmap, (loc) => loc.r).map(l => l.join('')).join('\n')
+  console.log('Grid:', `\n${gridOutput}`)
+
+  const pathOutput = heightmapToArray(heightmap, (loc) => pad(!loc.visited ? loc.r : loc.r + '.')).map(l => l.join('')).join('\n')
+  console.log('Path:', `\n${pathOutput}`)
+
+  const solution = path.map(n => n.cell.r).reduce((acc, n) => acc + n, 0)
   report('Solution 1:', solution)
 }
 
 async function solveForSecondStar (input) {
-  const solution = 'UNSOLVED'
+  const sizeIncrease = 5
+  const heightmap = parseHeightmap(input, sizeIncrease)
+  const path = findPathThroughHeightmap(heightmap)
+
+  const solution = path.map(n => n.cell.r).reduce((acc, n) => acc + n, 0)
   report('Solution 2:', solution)
 }
 

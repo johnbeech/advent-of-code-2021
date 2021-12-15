@@ -6,6 +6,6 @@
 
 ## Part 2
 
-(Not yet unlocked)
+Using the full map, **what is the lowest total risk of any path from the top left to the bottom right?**
 
 <day15-Viewer />

@@ -2,9 +2,10 @@ const path = require('path')
 const { read, position } = require('promise-path')
 const fromHere = position(__dirname)
 const report = (...messages) => console.log(`[${require(fromHere('../../package.json')).logName} / ${__dirname.split(path.sep).pop()}]`, ...messages)
+const { astar, Graph } = require('./astar')
 
 async function run () {
-  const input = (await read(fromHere('input.txt'), 'utf8')).trim()
+  const input = (await read(fromHere('test.txt'), 'utf8')).trim()
 
   await solveForFirstStar(input)
   await solveForSecondStar(input)
@@ -26,6 +27,7 @@ function parseHeightmap (input) {
     cells.forEach((cell, x) => {
       const location = {
         h: cell,
+        r: 10 - cell,
         x,
         y,
         key: [x, y].join(':')
@@ -57,16 +59,40 @@ function parseHeightmap (input) {
     return neighbours
   }
 
+  heightmap.get = get
   heightmap.getNeighbours = getNeighbours
 
+  heightmap.grid = heightmapToArray(heightmap, 'r')
+  heightmap.graph = new Graph(heightmap.grid)
+  const { height, width, graph } = heightmap
+  const start = graph.grid[0][0]
+  const end = graph.grid[height - 1][width - 1]
+  const path = astar.search(graph, start, end)
+  heightmap.path = path
+
   return heightmap
+}
+
+function heightmapToArray (heightmap, symbolProperty) {
+  const output = []
+  for (let j = 0; j <= heightmap.height; j++) {
+    const line = []
+    for (let i = 0; i <= heightmap.width; i++) {
+      const location = heightmap.get(i, j)
+      const symbol = location[symbolProperty]
+      line.push(symbol)
+    }
+    output.push(line)
+  }
+  return output
 }
 
 async function solveForFirstStar (input) {
   const heightmap = parseHeightmap(input)
 
-  const solution = 'UNSOLVED'
-  report('Heightmap:', heightmap)
+  const path = heightmap.path
+  path.shift()
+  const solution = path.map(n => n.weight).reduce((acc, n) => acc + n, 0)
   report('Solution 1:', solution)
 }
 
